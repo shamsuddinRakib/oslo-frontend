@@ -1,0 +1,109 @@
+{
+  "products": [
+    {
+      "id": "1",
+      "name": "Minimalist Ceramic Vase",
+      "price": 45,
+      "originalPrice": 60,
+      "image": "https://picsum.photos/seed/vase/800/800",
+      "category": "Home Decor",
+      "description": "Handcrafted ceramic vase with a matte finish. Perfect for minimalist interiors."
+    },
+    {
+      "id": "2",
+      "name": "Cotton Linen Cushion",
+      "price": 25,
+      "originalPrice": 35,
+      "image": "https://picsum.photos/seed/cushion/800/800",
+      "category": "Home Decor",
+      "description": "Soft and breathable cotton linen cushion cover. Available in multiple earthy tones."
+    },
+    {
+      "id": "3",
+      "name": "Oak Wood Coffee Table",
+      "price": 299,
+      "originalPrice": 350,
+      "image": "https://picsum.photos/seed/table/800/800",
+      "category": "Furniture",
+      "description": "Solid oak wood coffee table with a natural oil finish. Timeless design for your living room."
+    },
+    {
+      "id": "4",
+      "name": "Abstract Wall Art",
+      "price": 85,
+      "originalPrice": 120,
+      "image": "https://picsum.photos/seed/art/800/800",
+      "category": "Home Decor",
+      "description": "Original abstract painting on canvas. Adds a touch of modern elegance to any space."
+    }
+  ],
+  "categories": [
+    {
+      "id": "1",
+      "name": "Home Decor",
+      "image": "https://picsum.photos/seed/decor/800/1000"
+    },
+    {
+      "id": "2",
+      "name": "Furniture",
+      "image": "https://picsum.photos/seed/furniture/800/1000"
+    },
+    {
+      "id": "3",
+      "name": "Lighting",
+      "image": "https://picsum.photos/seed/lighting/800/1000"
+    },
+    {
+      "id": "4",
+      "name": "Kitchen",
+      "image": "https://picsum.photos/seed/kitchen/800/1000"
+    },
+    {
+      "name": "demo",
+      "id": "1775665975121",
+      "image": "/uploads/1775665975116-1Screenshot 2025-12-20 141655.png"
+    }
+  ],
+  "orders": [
+    {
+      "items": [
+        {
+          "id": "1",
+          "name": "Minimalist Ceramic Vase",
+          "price": 45,
+          "originalPrice": 60,
+          "image": "https://picsum.photos/seed/vase/800/800",
+          "category": "Home Decor",
+          "description": "Handcrafted ceramic vase with a matte finish. Perfect for minimalist interiors.",
+          "quantity": 2
+        },
+        {
+          "id": "2",
+          "name": "Cotton Linen Cushion",
+          "price": 25,
+          "originalPrice": 35,
+          "image": "https://picsum.photos/seed/cushion/800/800",
+          "category": "Home Decor",
+          "description": "Soft and breathable cotton linen cushion cover. Available in multiple earthy tones.",
+          "quantity": 2
+        }
+      ],
+      "total": 140,
+      "customer": {
+        "email": "shamsuddin.rakib@northsouth.edu",
+        "name": "shamsuddin.rakib",
+        "address": "dhaka",
+        "city": "dhaka",
+        "zip": "234",
+        "phone": "12456789"
+      },
+      "userId": "1",
+      "paymentMethod": "COD",
+      "id": "ORD-3SHH6WXUW",
+      "status": "delivered",
+      "createdAt": "2026-04-08T16:28:54.740Z"
+    }
+  ],
+  "users": [],
+  "wishlist": []
+}

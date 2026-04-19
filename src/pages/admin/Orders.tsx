@@ -1,0 +1,152 @@
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { api } from "@/src/lib/api";
+import { Button } from "@/src/components/ui/button";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/src/components/ui/table";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/src/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/components/ui/select";
+import { Badge } from "@/src/components/ui/badge";
+import { format } from "date-fns";
+import { toast } from "sonner";
+import { Printer } from "lucide-react";
+
+export default function AdminOrders() {
+  const [orders, setOrders] = useState([]);
+  const [selectedOrder, setSelectedOrder] = useState<any>(null);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    const data = await api.getOrders();
+    setOrders(data);
+  };
+
+  const handleStatusChange = async (id: string, status: string) => {
+    try {
+      await api.updateOrderStatus(id, status);
+      toast.success("Order status updated");
+      fetchData();
+      if (selectedOrder?.id === id) {
+        setSelectedOrder({ ...selectedOrder, status });
+      }
+    } catch (error) {
+      toast.error("Failed to update status");
+    }
+  };
+
+  return (
+    <div className="space-y-8">
+      <h1 className="text-3xl font-bold tracking-tight">Orders</h1>
+
+      <div className="border rounded-lg">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Order ID</TableHead>
+              <TableHead>Customer</TableHead>
+              <TableHead>Date</TableHead>
+              <TableHead>Total</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {orders.map((order: any) => (
+              <TableRow key={order.id}>
+                <TableCell className="font-medium">{order.id}</TableCell>
+                <TableCell>{order.customer?.name || "N/A"}</TableCell>
+                <TableCell>{format(new Date(order.createdAt), "MMM d, yyyy")}</TableCell>
+                <TableCell>${order.total?.toFixed(2)}</TableCell>
+                <TableCell>
+                  <Badge variant={order.status === "delivered" ? "default" : "secondary"}>
+                    {order.status.toUpperCase()}
+                  </Badge>
+                </TableCell>
+                <TableCell className="text-right flex justify-end gap-2">
+                  <Button variant="ghost" size="sm" onClick={() => setSelectedOrder(order)}>
+                    View Details
+                  </Button>
+                  <Link to={`/admin/orders/${order.id}/invoice`}>
+                    <Button variant="outline" size="sm" className="gap-2">
+                      <Printer className="h-4 w-4" />
+                      Invoice
+                    </Button>
+                  </Link>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+
+      <Dialog open={!!selectedOrder} onOpenChange={() => setSelectedOrder(null)}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader className="flex flex-row items-center justify-between">
+            <DialogTitle>Order Details: {selectedOrder?.id}</DialogTitle>
+            {selectedOrder && (
+              <Link to={`/admin/orders/${selectedOrder.id}/invoice`}>
+                <Button variant="outline" size="sm" className="gap-2">
+                  <Printer className="h-4 w-4" />
+                  Generate Invoice
+                </Button>
+              </Link>
+            )}
+          </DialogHeader>
+          {selectedOrder && (
+            <div className="space-y-6">
+              <div className="grid grid-cols-2 gap-8">
+                <div className="space-y-2">
+                  <h3 className="font-bold text-sm uppercase text-muted-foreground">Customer</h3>
+                  <p className="text-sm">{selectedOrder.customer?.name}</p>
+                  <p className="text-sm">{selectedOrder.customer?.email}</p>
+                  <p className="text-sm">{selectedOrder.customer?.phone}</p>
+                </div>
+                <div className="space-y-2">
+                  <h3 className="font-bold text-sm uppercase text-muted-foreground">Shipping Address</h3>
+                  <p className="text-sm">{selectedOrder.customer?.address}</p>
+                  <p className="text-sm">{selectedOrder.customer?.city}, {selectedOrder.customer?.zip}</p>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="font-bold text-sm uppercase text-muted-foreground">Order Items</h3>
+                <div className="space-y-2">
+                  {selectedOrder.items?.map((item: any) => (
+                    <div key={item.id} className="flex justify-between text-sm">
+                      <span>{item.name} x {item.quantity}</span>
+                      <span>${(item.price * item.quantity).toFixed(2)}</span>
+                    </div>
+                  ))}
+                  <div className="pt-2 border-t flex justify-between font-bold">
+                    <span>Total</span>
+                    <span>${selectedOrder.total?.toFixed(2)}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="font-bold text-sm uppercase text-muted-foreground">Change Status</h3>
+                <Select
+                  value={selectedOrder.status}
+                  onValueChange={(val) => handleStatusChange(selectedOrder.id, val)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="pending">Pending</SelectItem>
+                    <SelectItem value="shipped">Shipped</SelectItem>
+                    <SelectItem value="delivered">Delivered</SelectItem>
+                    <SelectItem value="cancelled">Cancelled</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}

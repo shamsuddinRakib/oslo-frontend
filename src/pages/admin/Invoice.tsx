@@ -4,12 +4,14 @@ import { api } from "@/src/lib/api";
 import { Button } from "@/src/components/ui/button";
 import { format } from "date-fns";
 import { Printer, ArrowLeft } from "lucide-react";
+import { useSettings } from "@/src/context/SettingsContext";
 
 export default function AdminInvoice() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [order, setOrder] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const { settings } = useSettings();
 
   useEffect(() => {
     if (id) {
@@ -54,13 +56,13 @@ export default function AdminInvoice() {
         <div className="flex justify-between items-start border-b pb-8 mb-8">
           <div className="space-y-2">
             <h1 className="text-3xl font-bold tracking-tighter">INVOICE</h1>
-            <p className="text-muted-foreground">Order #{order.id}</p>
+            <p className="text-muted-foreground">Order #{order.order_id}</p>
           </div>
           <div className="text-right space-y-1">
-            <h2 className="font-bold text-xl">MINIMAL STORE</h2>
-            <p className="text-sm text-muted-foreground">123 Design Street</p>
-            <p className="text-sm text-muted-foreground">Creative City, 10001</p>
-            <p className="text-sm text-muted-foreground">contact@minimal.store</p>
+            <h2 className="font-bold text-xl">{settings?.website_name}</h2>
+            <p className="text-sm text-muted-foreground">{settings?.email}</p>
+            <p className="text-sm text-muted-foreground">{settings?.phone}</p>
+            <p className="text-sm text-muted-foreground">{settings?.address}</p>
           </div>
         </div>
 
@@ -69,17 +71,17 @@ export default function AdminInvoice() {
           <div className="space-y-3">
             <h3 className="font-bold text-sm uppercase tracking-wider text-muted-foreground">Bill To</h3>
             <div className="text-sm space-y-1">
-              <p className="font-bold text-base">{order.customer?.name}</p>
-              <p>{order.customer?.email}</p>
-              <p>{order.customer?.phone}</p>
+              <p className="font-bold text-base">{order.user_name}</p>
+              <p>{order.user_email}</p>
+              <p>{order.user_phone}</p>
             </div>
           </div>
           <div className="space-y-3">
             <h3 className="font-bold text-sm uppercase tracking-wider text-muted-foreground">Ship To</h3>
             <div className="text-sm space-y-1">
-              <p className="font-bold text-base">{order.customer?.name}</p>
-              <p>{order.customer?.address}</p>
-              <p>{order.customer?.city}, {order.customer?.zip}</p>
+              <p className="font-bold text-base">{order.user_name}</p>
+              <p>{order.shipping_address}</p>
+              <p>{order.user_city}, {order.user_zip}</p>
             </div>
           </div>
         </div>
@@ -88,11 +90,11 @@ export default function AdminInvoice() {
         <div className="grid grid-cols-3 gap-8 mb-12 border-y py-6">
           <div>
             <h3 className="text-xs font-bold uppercase text-muted-foreground mb-1">Invoice Date</h3>
-            <p className="text-sm font-medium">{format(new Date(order.createdAt), "MMMM d, yyyy")}</p>
+            <p className="text-sm font-medium">{format(new Date(order.created_at), "MMMM d, yyyy")}</p>
           </div>
           <div>
             <h3 className="text-xs font-bold uppercase text-muted-foreground mb-1">Payment Method</h3>
-            <p className="text-sm font-medium">{order.paymentMethod || "Cash on Delivery"}</p>
+            <p className="text-sm font-medium">{order.payment_status || "Cash on Delivery"}</p>
           </div>
           <div>
             <h3 className="text-xs font-bold uppercase text-muted-foreground mb-1">Order Status</h3>
@@ -111,14 +113,14 @@ export default function AdminInvoice() {
             </tr>
           </thead>
           <tbody className="text-sm">
-            {order.items?.map((item: any) => (
+            {order.order_items?.map((item: any) => (
               <tr key={item.id} className="border-b">
                 <td className="py-4">
-                  <p className="font-medium">{item.name}</p>
+                  <p className="font-medium">{item.product_name}</p>
                 </td>
                 <td className="py-4 text-center">{item.quantity}</td>
-                <td className="py-4 text-right">${item.price.toFixed(2)}</td>
-                <td className="py-4 text-right">${(item.price * item.quantity).toFixed(2)}</td>
+                <td className="py-4 text-right">৳{item.product_price}</td>
+                <td className="py-4 text-right">৳{(item.product_price * item.quantity)}</td>
               </tr>
             ))}
           </tbody>
@@ -129,15 +131,15 @@ export default function AdminInvoice() {
           <div className="w-64 space-y-3">
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Subtotal</span>
-              <span>${order.total?.toFixed(2)}</span>
+              <span>৳{order.subtotal_amount}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Shipping</span>
-              <span>$0.00</span>
+              <span>৳{order.shipping_charge}</span>
             </div>
             <div className="flex justify-between text-lg font-bold border-t pt-3">
               <span>Total</span>
-              <span>${order.total?.toFixed(2)}</span>
+              <span>৳{order.total_amount}</span>
             </div>
           </div>
         </div>

@@ -19,19 +19,20 @@ export default function AdminDashboard() {
     { label: "Pending", value: reports.statusCounts.pending, icon: Clock, color: "text-orange-600" },
     { label: "Shipped", value: reports.statusCounts.shipped, icon: Truck, color: "text-blue-400" },
     { label: "Delivered", value: reports.statusCounts.delivered, icon: CheckCircle2, color: "text-green-600" },
-    { label: "Total Sales", value: `$${reports.totalSales.toFixed(2)}`, icon: BarChart3, color: "text-emerald-600" },
+    { label: "Total Sales", value: `৳${reports.totalSales.toFixed(2)}`, icon: BarChart3, color: "text-emerald-600" },
   ];
 
   const chartData = [
     { name: "Pending", count: reports.statusCounts.pending },
     { name: "Shipped", count: reports.statusCounts.shipped },
     { name: "Delivered", count: reports.statusCounts.delivered },
+    { name: "Cancelled", count: reports.statusCounts.cancelled },
   ];
 
   return (
     <div className="space-y-8">
       <h1 className="text-3xl font-bold tracking-tight">Dashboard Overview</h1>
-
+      
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
         {stats.map((stat) => (
           <Card key={stat.label}>

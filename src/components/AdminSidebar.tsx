@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, Package, List, ShoppingBag, BarChart3, LogOut, Home } from "lucide-react";
+import { LayoutDashboard, Package, List, ShoppingBag, BarChart3, LogOut, Home, Users, Settings, User } from "lucide-react";
 import { cn } from "@/src/lib/utils";
 import { Button } from "@/src/components/ui/button";
 import { useAuth } from "@/src/context/AuthContext";
@@ -12,14 +12,17 @@ export function AdminSidebar() {
     { icon: LayoutDashboard, label: "Dashboard", path: "/admin" },
     { icon: Package, label: "Products", path: "/admin/products" },
     { icon: List, label: "Categories", path: "/admin/categories" },
+    { icon: Users, label: "Trusted Clients", path: "/admin/trusted-clients" },
     { icon: ShoppingBag, label: "Orders", path: "/admin/orders" },
     { icon: BarChart3, label: "Reports", path: "/admin/reports" },
+    { icon: Settings, label: "Settings", path: "/admin/settings" },
+    { icon: User, label: "Profile", path: "/admin/profile" },
   ];
 
   return (
     <div className="flex flex-col h-screen w-64 border-r bg-muted/10 print:hidden">
       <div className="p-6">
-        <Link to="/" className="text-xl font-bold tracking-tighter">MINIMAL ADMIN</Link>
+        <Link to="/" className="text-xl font-bold tracking-tighter">OSLO BD ADMIN</Link>
       </div>
       <nav className="flex-1 px-4 space-y-2">
         {menuItems.map((item) => (

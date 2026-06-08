@@ -7,6 +7,8 @@ import { useCart } from "@/src/context/CartContext";
 import { useWishlist } from "@/src/context/WishlistContext";
 import { toast } from "sonner";
 import { cn } from "@/src/lib/utils";
+import { SERVER_URL } from "@/src/lib/api";
+import ReactPixel from 'react-facebook-pixel';
 
 interface ProductCardProps {
   key?: string | number;
@@ -15,7 +17,7 @@ interface ProductCardProps {
     name: string;
     price: number;
     originalPrice: number;
-    image: string;
+    thumb_image: string;
     category: string;
   };
 }
@@ -46,15 +48,15 @@ export function ProductCard({ product }: ProductCardProps) {
       <div className="relative aspect-square overflow-hidden bg-muted">
         <Link to={`/product/${product.id}`}>
           <img
-            src={product.image}
+            src={product.thumb_image}
             alt={product.name}
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
             referrerPolicy="no-referrer"
           />
         </Link>
-        <Button
-          size="icon"
-          variant="ghost"
+        <Button 
+          size="icon" 
+          variant="ghost" 
           className={cn(
             "absolute top-2 right-2 h-8 w-8 rounded-full bg-white/80 backdrop-blur-sm hover:bg-white shadow-sm z-10 transition-colors",
             isWishlisted ? "text-red-500" : "text-muted-foreground"
@@ -64,23 +66,30 @@ export function ProductCard({ product }: ProductCardProps) {
           <Heart className={cn("h-4 w-4", isWishlisted && "fill-current")} />
         </Button>
       </div>
-      <CardContent className="pt-4 px-4">
-        <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">{product.category}</p>
+      <CardContent className="lg:pt-4 px-4">
+        <p className="text-xs text-muted-foreground uppercase tracking-wider ">{product.category}</p>
         <h3 className="font-medium text-sm line-clamp-1">{product.name}</h3>
       </CardContent>
-      <CardFooter className="pb-4 px-4 flex items-center justify-between">
+      <CardFooter className="lg:pb-4 px-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="font-bold text-sm">${product.price.toFixed(2)}</span>
+          <span className="font-bold text-sm">৳ {product.price.toFixed(2)}</span>
           {product.originalPrice > product.price && (
             <span className="text-xs text-muted-foreground line-through">
-              ${product.originalPrice.toFixed(2)}
+              ৳ {product.originalPrice.toFixed(2)} 
             </span>
           )}
         </div>
-        <Button
-          size="icon"
-          className="h-8 w-8 rounded-md bg-slate-900 text-slate-50 hover:bg-slate-800 shrink-0"
-          onClick={handleAddToCart}
+        <Button 
+          size="icon" 
+          className="h-8 w-8 rounded-md bg-slate-900 text-slate-50 hover:bg-slate-800 shrink-0" 
+          onClick={(e)=>{
+            handleAddToCart(e)
+            ReactPixel.track('AddToCart', {
+              content_name: product.name,
+              value: product.price,
+              currency: 'BDT',
+            });
+          }}
         >
           <ShoppingCart className="h-4 w-4" />
         </Button>

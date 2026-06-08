@@ -6,24 +6,40 @@ import { Input } from "@/src/components/ui/input";
 import { Label } from "@/src/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/src/components/ui/card";
 import { toast } from "sonner";
+import ReactPixel from 'react-facebook-pixel';
+import { useDocumentTitle } from "@/src/hooks/useDocumentTitle";
 
 export default function Register() {
+  useDocumentTitle("Register");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const { register } = useAuth();
   const navigate = useNavigate();
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     if (password !== confirmPassword) {
       toast.error("Passwords do not match");
       return;
     }
-    register(name, email);
-    toast.success("Account created successfully!");
-    navigate("/");
+    
+    try {
+      await register({
+        name,
+        email,
+        phone,
+        password,
+        password_confirmation: confirmPassword,
+        role: "user"
+      });
+      toast.success("Account created successfully! Please log in.");
+      navigate("/login");
+    } catch (error: any) {
+      toast.error(error.message || "Registration failed");
+    }
   };
 
   return (
@@ -46,12 +62,22 @@ export default function Register() {
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="phone">Phone Number</Label>
+              <Input
+                id="phone"
+                type="tel"
+                placeholder="01234567890"
+                required
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="email">Email (Optional)</Label>
               <Input
                 id="email"
                 type="email"
                 placeholder="user@example.com"
-                required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
@@ -76,7 +102,9 @@ export default function Register() {
                 onChange={(e) => setConfirmPassword(e.target.value)}
               />
             </div>
-            <Button type="submit" className="w-full">Register</Button>
+            <Button type="submit" className="w-full" onClick={() => {
+              ReactPixel.track('CompleteRegistration');
+            }}>Register</Button>
           </form>
         </CardContent>
         <CardFooter className="flex justify-center">

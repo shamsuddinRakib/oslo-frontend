@@ -56,9 +56,9 @@ export default function AdminOrders() {
             {orders.map((order: any) => (
               <TableRow key={order.id}>
                 <TableCell className="font-medium">{order.id}</TableCell>
-                <TableCell>{order.customer?.name || "N/A"}</TableCell>
-                <TableCell>{format(new Date(order.createdAt), "MMM d, yyyy")}</TableCell>
-                <TableCell>${order.total?.toFixed(2)}</TableCell>
+                <TableCell>{order.user_name || "N/A"}</TableCell>
+                <TableCell>{format(new Date(order.created_at), "MMM d, yyyy")}</TableCell>
+                <TableCell>৳{order.total_amount}</TableCell>
                 <TableCell>
                   <Badge variant={order.status === "delivered" ? "default" : "secondary"}>
                     {order.status.toUpperCase()}
@@ -84,7 +84,7 @@ export default function AdminOrders() {
       <Dialog open={!!selectedOrder} onOpenChange={() => setSelectedOrder(null)}>
         <DialogContent className="sm:max-w-[600px]">
           <DialogHeader className="flex flex-row items-center justify-between">
-            <DialogTitle>Order Details: {selectedOrder?.id}</DialogTitle>
+            <DialogTitle>Order Details: {selectedOrder?.order_id}</DialogTitle>
             {selectedOrder && (
               <Link to={`/admin/orders/${selectedOrder.id}/invoice`}>
                 <Button variant="outline" size="sm" className="gap-2">
@@ -99,13 +99,13 @@ export default function AdminOrders() {
               <div className="grid grid-cols-2 gap-8">
                 <div className="space-y-2">
                   <h3 className="font-bold text-sm uppercase text-muted-foreground">Customer</h3>
-                  <p className="text-sm">{selectedOrder.customer?.name}</p>
-                  <p className="text-sm">{selectedOrder.customer?.email}</p>
-                  <p className="text-sm">{selectedOrder.customer?.phone}</p>
+                  <p className="text-sm">{selectedOrder.user_name??'Guest'}</p>
+                  <p className="text-sm">{selectedOrder.user_email??''}</p>
+                  <p className="text-sm">{selectedOrder.user_phone??''}</p>
                 </div>
                 <div className="space-y-2">
                   <h3 className="font-bold text-sm uppercase text-muted-foreground">Shipping Address</h3>
-                  <p className="text-sm">{selectedOrder.customer?.address}</p>
+                  <p className="text-sm">{selectedOrder.shipping_address??''}</p>
                   <p className="text-sm">{selectedOrder.customer?.city}, {selectedOrder.customer?.zip}</p>
                 </div>
               </div>
@@ -113,15 +113,15 @@ export default function AdminOrders() {
               <div className="space-y-2">
                 <h3 className="font-bold text-sm uppercase text-muted-foreground">Order Items</h3>
                 <div className="space-y-2">
-                  {selectedOrder.items?.map((item: any) => (
+                  {selectedOrder.order_items?.map((item: any) => (
                     <div key={item.id} className="flex justify-between text-sm">
-                      <span>{item.name} x {item.quantity}</span>
-                      <span>${(item.price * item.quantity).toFixed(2)}</span>
+                      <span>{item.product_name} x {item.quantity}</span>
+                      <span>৳{(item.product_price * item.quantity).toFixed(2)}</span>
                     </div>
                   ))}
                   <div className="pt-2 border-t flex justify-between font-bold">
                     <span>Total</span>
-                    <span>${selectedOrder.total?.toFixed(2)}</span>
+                    <span>৳{selectedOrder.total_amount}</span>
                   </div>
                 </div>
               </div>

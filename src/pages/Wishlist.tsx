@@ -1,7 +1,9 @@
 import { ProductCard } from "@/src/components/ProductCard";
 import { useWishlist } from "@/src/context/WishlistContext";
+import { useDocumentTitle } from "@/src/hooks/useDocumentTitle";
 
 export default function Wishlist() {
+  useDocumentTitle("My Wishlist");
   const { wishlist } = useWishlist();
 
   return (

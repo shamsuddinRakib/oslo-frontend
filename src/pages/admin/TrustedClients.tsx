@@ -1,18 +1,17 @@
-import React, { useEffect, useState } from "react";
-import { api, SERVER_URL } from "@/src/lib/api";
+import React, { useEffect, useState, useRef } from "react";
+import { api } from "@/src/lib/api";
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
 import { Label } from "@/src/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/src/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/src/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/src/components/ui/dialog";
 import { Plus, Trash2, Pencil, X } from "lucide-react";
 import { toast } from "sonner";
-import { useRef } from "react";
 
-export default function AdminCategories() {
-  const [categories, setCategories] = useState([]);
+export default function AdminTrustedClients() {
+  const [clients, setClients] = useState([]);
   const [isAddOpen, setIsAddOpen] = useState(false);
-  const [editingCategory, setEditingCategory] = useState<any>(null);
+  const [editingClient, setEditingClient] = useState<any>(null);
   const [preview, setPreview] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -21,8 +20,8 @@ export default function AdminCategories() {
   }, []);
 
   const fetchData = async () => {
-    const data = await api.getCategories();
-    setCategories(data);
+    const data = await api.getTrustedClients();
+    setClients(data);
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -36,34 +35,34 @@ export default function AdminCategories() {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     try {
-      if (editingCategory) {
-        const res = await api.updateCategory(editingCategory.id, formData);
-        if (res.ok) {
-          toast.success("Category updated");
+      if (editingClient) {
+        const res = await api.updateTrustedClient(editingClient.id, formData);
+        if (res.status) {
+          toast.success("Trusted client updated");
         } else {
-          toast.error(res.message || "Failed to update category");
+          toast.error("Failed to update trusted client");
         }
       } else {
-        const res = await api.createCategory(formData);
-        if (res.ok) {
-          toast.success("Category created");
+        const res = await api.createTrustedClient(formData);
+        if (res.status) {
+          toast.success("Trusted client created");
         } else {
-          toast.error(res.message || "Failed to create category");
+          toast.error("Failed to create trusted client");
         }
       }
       setIsAddOpen(false);
-      setEditingCategory(null);
+      setEditingClient(null);
       setPreview("");
       fetchData();
     } catch (error) {
-      toast.error(editingCategory ? "Failed to update category" : "Failed to create category");
+      toast.error(editingClient ? "Failed to update client" : "Failed to create client");
     }
   };
 
   const handleDelete = async (id: string) => {
     if (confirm("Are you sure?")) {
-      await api.deleteCategory(id);
-      toast.success("Category deleted");
+      await api.deleteTrustedClient(id);
+      toast.success("Trusted client deleted");
       fetchData();
     }
   };
@@ -71,37 +70,37 @@ export default function AdminCategories() {
   return (
     <div className="space-y-8">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold tracking-tight">Categories</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Trusted Clients</h1>
         <Button onClick={() => {
-          setEditingCategory(null);
+          setEditingClient(null);
           setPreview("");
           setIsAddOpen(true);
         }}>
           <Plus className="h-4 w-4 mr-2" />
-          Add Category
+          Add Client
         </Button>
 
         <Dialog open={isAddOpen} onOpenChange={(open) => {
           setIsAddOpen(open);
           if (!open) {
-            setEditingCategory(null);
+            setEditingClient(null);
             setPreview("");
           }
         }}>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
-              <DialogTitle>{editingCategory ? "Edit Category" : "Add New Category"}</DialogTitle>
+              <DialogTitle>{editingClient ? "Edit Client" : "Add New Client"}</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid gap-2">
-                <Label htmlFor="name">Category Name</Label>
-                <Input id="name" name="name" defaultValue={editingCategory?.name} required />
+                <Label htmlFor="name">Client Name</Label>
+                <Input id="name" name="name" defaultValue={editingClient?.name} required />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="image">Category Image</Label>
+                <Label htmlFor="logo">Client Logo</Label>
                 {preview && (
-                  <div className="relative h-20 w-20 rounded border overflow-hidden group">
-                    <img src={preview} alt="" className="h-full w-full object-cover" />
+                  <div className="relative h-20 w-20 rounded border overflow-hidden group bg-muted">
+                    <img src={preview} alt="" className="h-full w-full object-contain" />
                     <button
                       type="button"
                       onClick={() => {
@@ -116,16 +115,16 @@ export default function AdminCategories() {
                 )}
                 <Input 
                   ref={fileInputRef}
-                  id="image" 
-                  name="image" 
+                  id="logo" 
+                  name="logo" 
                   type="file" 
                   accept="image/*" 
                   onChange={handleImageChange}
-                  required={!editingCategory} 
+                  required={!editingClient} 
                 />
               </div>
               <Button type="submit" className="w-full">
-                {editingCategory ? "Update Category" : "Create Category"}
+                {editingClient ? "Update Client" : "Create Client"}
               </Button>
             </form>
           </DialogContent>
@@ -136,34 +135,41 @@ export default function AdminCategories() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Image</TableHead>
+              <TableHead>Logo</TableHead>
               <TableHead>Name</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {categories.map((cat: any) => (
-              <TableRow key={cat.id}>
+            {clients.map((client: any) => (
+              <TableRow key={client.id}>
                 <TableCell>
-                  <div className="h-10 w-10 rounded bg-muted overflow-hidden">
-                    <img src={cat.image_url} alt="" className="h-full w-full object-cover" referrerPolicy="no-referrer" />
+                  <div className="h-10 w-24 rounded bg-muted overflow-hidden flex items-center justify-center p-1">
+                    <img src={client.logo} alt={client.name} className="h-full w-full object-contain" referrerPolicy="no-referrer" />
                   </div>
                 </TableCell> 
-                <TableCell className="font-medium">{cat.name}</TableCell>
+                <TableCell className="font-medium">{client.name}</TableCell>
                 <TableCell className="text-right space-x-2">
                   <Button variant="ghost" size="icon" onClick={() => {
-                    setEditingCategory(cat);
-                    setPreview(cat.image_url);
+                    setEditingClient(client);
+                    setPreview(client.logo);
                     setIsAddOpen(true);
                   }}>
                     <Pencil className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDelete(cat.id)}>
+                  <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDelete(client.id)}>
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </TableCell>
               </TableRow>
             ))}
+            {clients.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={3} className="text-center py-8 text-muted-foreground">
+                  No trusted clients found.
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </div>

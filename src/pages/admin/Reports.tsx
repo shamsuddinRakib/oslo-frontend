@@ -55,6 +55,7 @@ export default function AdminReports() {
                 { name: "Pending", count: reports.statusCounts.pending },
                 { name: "Shipped", count: reports.statusCounts.shipped },
                 { name: "Delivered", count: reports.statusCounts.delivered },
+                { name: "Cancelled", count: reports.statusCounts.cancelled },
               ]}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
                 <XAxis dataKey="name" />
@@ -75,12 +76,12 @@ export default function AdminReports() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div className="space-y-1">
               <p className="text-sm text-muted-foreground">Total Revenue</p>
-              <p className="text-2xl font-bold">${reports.totalSales.toFixed(2)}</p>
+              <p className="text-2xl font-bold">৳{reports.totalSales.toFixed(2)}</p>
             </div>
             <div className="space-y-1">
               <p className="text-sm text-muted-foreground">Average Order Value</p>
               <p className="text-2xl font-bold">
-                ${(reports.totalSales / (reports.totalOrders || 1)).toFixed(2)}
+                ৳{(reports.totalSales / (reports.totalOrders || 1)).toFixed(2)}
               </p>
             </div>
             <div className="space-y-1">

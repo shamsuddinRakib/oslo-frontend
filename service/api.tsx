@@ -1,5 +1,5 @@
-export const SERVER_URL = 'http://127.0.0.1:8000/api';
-export const IMAGE_URL = 'http://127.0.0.1:8000/storage';
+export const SERVER_URL = 'https://api.oslobd.com/api';
+export const IMAGE_URL = 'https://api.oslobd.com/storage';
 
 export async function register(name:string,phone:string,email:string,password:string,password_confirmation:string) {
     const response = await fetch(`${SERVER_URL}/register`, {

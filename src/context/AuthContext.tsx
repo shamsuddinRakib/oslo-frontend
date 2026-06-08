@@ -1,17 +1,19 @@
-
+import React, { createContext, useContext, useState, useEffect } from "react";
+import { api } from "../lib/api";
 
 interface User {
   id: string;
   name: string;
-  email: string;
+  email?: string;
+  phone?: string;
   role: "user" | "admin";
 }
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, role: "user" | "admin") => void;
-  register: (name: string, email: string) => void;
-  logout: () => void;
+  login: (phone: string, password: string) => Promise<any>;
+  register: (data: any) => Promise<any>;
+  logout: () => Promise<void>;
   updateProfile: (data: Partial<User>) => void;
 }
 
@@ -28,28 +30,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       localStorage.setItem("user", JSON.stringify(user));
     } else {
       localStorage.removeItem("user");
+      localStorage.removeItem("token");
     }
   }, [user]);
 
-  const login = (email: string, role: "user" | "admin") => {
-    setUser({
-      id: "1",
-      name: email.split("@")[0],
-      email,
-      role,
-    });
+  const login = async (phone: string, password: string) => {
+    const res = await api.login(phone, password);
+    if (res.ok) {
+      localStorage.setItem("token", res.token);
+      setUser(res.user);
+      return res;
+    }
+    throw new Error(res.message || "Login failed");
   };
 
-  const register = (name: string, email: string) => {
-    setUser({
-      id: Math.random().toString(36).substr(2, 9),
-      name,
-      email,
-      role: "user",
-    });
+  const register = async (data: any) => {
+    const res = await api.register(data);
+    if (res.ok) {
+      return res;
+    }
+    throw new Error(res.message || "Registration failed");
   };
 
-  const logout = () => setUser(null);
+  const logout = async () => {
+    try {
+      await api.logout();
+    } catch (e) {
+      // Ignore errors if token is invalid
+    }
+    setUser(null);
+  };
 
   const updateProfile = (data: Partial<User>) => {
     setUser((prev) => (prev ? { ...prev, ...data } : null));

@@ -8,6 +8,7 @@ import { Separator } from "@/src/components/ui/separator";
 import { format } from "date-fns";
 import { ArrowLeft, Package, Truck, CheckCircle, Clock } from "lucide-react";
 import { cn } from "@/src/lib/utils";
+import { IMAGE_URL } from "@/service/api";
 
 export default function OrderDetail() {
   const { id } = useParams();
@@ -62,17 +63,17 @@ export default function OrderDetail() {
           <div className="relative flex justify-between max-w-2xl mx-auto">
             {/* Progress Line Background */}
             <div className="absolute top-5 left-0 w-full h-1 bg-muted -translate-y-1/2 rounded-full" />
-
+            
             {/* Active Progress Line */}
-            <div
-              className="absolute top-5 left-0 h-1 bg-primary -translate-y-1/2 transition-all duration-700 rounded-full"
+            <div 
+              className="absolute top-5 left-0 h-1 bg-primary -translate-y-1/2 transition-all duration-700 rounded-full" 
               style={{ width: `${(Math.max(0, currentStepIndex) / (steps.length - 1)) * 100}%` }}
             />
-
+            
             {steps.map((step, index) => {
               const isCompleted = index <= currentStepIndex;
               const isActive = index === currentStepIndex;
-
+              
               return (
                 <div key={step} className="relative z-10 flex flex-col items-center gap-3">
                   <div className={cn(
@@ -107,9 +108,9 @@ export default function OrderDetail() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
-                <CardTitle className="text-xl">Order #{order.id}</CardTitle>
+                <CardTitle className="text-xl">Order #{order.order_id}</CardTitle>
                 <p className="text-sm text-muted-foreground">
-                  Placed on {order.createdAt ? format(new Date(order.createdAt), "PPP p") : "N/A"}
+                  Placed on {order.created_at ? format(new Date(order.created_at), "PPP p") : "N/A"}
                 </p>
               </div>
               <div className="flex items-center gap-2">
@@ -123,37 +124,37 @@ export default function OrderDetail() {
               <div className="space-y-4">
                 <h3 className="font-bold">Items</h3>
                 <div className="space-y-4">
-                  {order.items?.map((item: any) => (
+                  {order.order_items?.map((item: any) => (
                     <div key={item.id} className="flex gap-4">
                       <div className="h-16 w-16 rounded bg-muted overflow-hidden flex-shrink-0">
-                        <img src={item.image} alt={item.name} className="h-full w-full object-cover" />
+                        <img src={IMAGE_URL +'/'+ item.product_image} alt={item.name} className="h-full w-full object-cover" />
                       </div>
                       <div className="flex-1 flex justify-between">
                         <div>
-                          <p className="font-medium">{item.name}</p>
+                          <p className="font-medium">{item.product_name}</p>
                           <p className="text-sm text-muted-foreground">Quantity: {item.quantity}</p>
                         </div>
-                        <p className="font-medium">${(item.price * item.quantity).toFixed(2)}</p>
+                        <p className="font-medium">৳ {(item.product_price * parseInt(item.quantity)).toFixed(2)}</p>
                       </div>
                     </div>
                   ))}
                 </div>
               </div>
-
+              
               <Separator />
-
+              
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Subtotal</span>
-                  <span>${order.total?.toFixed(2)}</span>
+                  <span>৳ {parseFloat(order.subtotal_amount)?.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Shipping</span>
-                  <span>Free</span>
+                  <span>৳ {parseFloat(order.shipping_charge)?.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between font-bold text-lg pt-2">
                   <span>Total</span>
-                  <span>${order.total?.toFixed(2)}</span>
+                  <span>৳ {parseFloat(order.total_amount)?.toFixed(2)}</span>
                 </div>
               </div>
             </CardContent>
@@ -166,10 +167,10 @@ export default function OrderDetail() {
               <CardTitle className="text-lg">Shipping Information</CardTitle>
             </CardHeader>
             <CardContent className="text-sm space-y-2">
-              <p className="font-medium">{order.customer?.name}</p>
-              <p className="text-muted-foreground">{order.customer?.address}</p>
-              <p className="text-muted-foreground">{order.customer?.city}, {order.customer?.zip}</p>
-              <p className="text-muted-foreground">{order.customer?.phone}</p>
+              <p className="font-medium">{order.user_name}</p>
+              <p className="text-muted-foreground">{order.shipping_address}</p>
+              {/* <p className="text-muted-foreground">{order.customer?.city}, {order.customer?.zip}</p> */}
+              <p className="text-muted-foreground">{order.user_phone}</p>
             </CardContent>
           </Card>
 
@@ -178,7 +179,7 @@ export default function OrderDetail() {
               <CardTitle className="text-lg">Payment Method</CardTitle>
             </CardHeader>
             <CardContent className="text-sm">
-              <p className="text-muted-foreground">Credit Card ending in **** 4242</p>
+              <p className="text-muted-foreground">Cash On Delivery</p>
             </CardContent>
           </Card>
         </div>

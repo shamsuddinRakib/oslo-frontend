@@ -7,20 +7,18 @@ import { Badge } from "@/src/components/ui/badge";
 import { Button } from "@/src/components/ui/button";
 import { format } from "date-fns";
 import { ChevronRight } from "lucide-react";
+import { useDocumentTitle } from "@/src/hooks/useDocumentTitle";
 
 export default function Orders() {
+  useDocumentTitle("My Orders");
   const [orders, setOrders] = useState([]);
   const { user } = useAuth();
 
   useEffect(() => {
-    api.getOrders().then((data) => {
-      if (user) {
-        setOrders(data.filter((o: any) => o.userId === user.id));
-      } else {
-        setOrders(data.filter((o: any) => o.userId === "guest"));
-      }
+    api.getUserOrders().then((data) => {
+      setOrders(data);
     });
-  }, [user]);
+  }, []); 
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -31,9 +29,9 @@ export default function Orders() {
             <Card key={order.id} className="hover:shadow-md transition-shadow">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <div>
-                  <CardTitle className="text-lg">Order #{order.id}</CardTitle>
+                  <CardTitle className="text-lg">Order #{order.order_id}</CardTitle>
                   <p className="text-sm text-muted-foreground">
-                    Placed on {format(new Date(order.createdAt), "PPP")}
+                    Placed on {format(new Date(order.created_at), "PPP")}
                   </p>
                 </div>
                 <Badge variant={order.status === "delivered" ? "default" : "secondary"}>
@@ -43,9 +41,9 @@ export default function Orders() {
               <CardContent className="flex items-center justify-between">
                 <div className="space-y-1">
                   <p className="text-sm font-medium">
-                    {order.items.length} {order.items.length === 1 ? "item" : "items"}
+                    {order.order_items.length} {order.order_items.length === 1 ? "item" : "items"}
                   </p>
-                  <p className="text-lg font-bold">${order.total.toFixed(2)}</p>
+                  <p className="text-lg font-bold">৳{parseFloat(order.total_amount).toFixed(2)}</p>
                 </div>
                 <Link to={`/orders/${order.id}`}>
                   <Button variant="outline" size="sm" className="gap-2">

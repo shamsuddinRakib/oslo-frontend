@@ -9,13 +9,16 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/src
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs";
 import { toast } from "sonner";
 import { User, ShoppingBag, Heart, Settings, LogOut, ChevronRight, Package } from "lucide-react";
+import { useDocumentTitle } from "@/src/hooks/useDocumentTitle";
 
 export default function Profile() {
+  useDocumentTitle("My Profile");
   const { user, updateProfile, logout } = useAuth();
   const [orders, setOrders] = useState([]);
   const [formData, setFormData] = useState({
     name: user?.name || "",
     email: user?.email || "",
+    phone: user?.phone || "",
   });
 
   useEffect(() => {
@@ -116,7 +119,7 @@ export default function Profile() {
                       <div key={order.id} className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors">
                         <div>
                           <p className="text-sm font-medium">Order #{order.id}</p>
-                          <p className="text-xs text-muted-foreground">${order.total.toFixed(2)}</p>
+                          <p className="text-xs text-muted-foreground">৳{order.total.toFixed(2)}</p>
                         </div>
                         <Link to={`/orders/${order.id}`}>
                           <Button variant="ghost" size="sm">Details</Button>
@@ -150,7 +153,11 @@ export default function Profile() {
                 </div>
                 <div className="space-y-1">
                   <p className="text-sm font-medium">Email Address</p>
-                  <p className="text-sm text-muted-foreground">{user?.email}</p>
+                  <p className="text-sm text-muted-foreground">{user?.email || "Not provided"}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm font-medium">Phone Number</p>
+                  <p className="text-sm text-muted-foreground">{user?.phone || "Not provided"}</p>
                 </div>
                 <Button variant="outline" className="w-full" onClick={() => {
                   const settingsTab = document.querySelector('[value="settings"]') as HTMLElement;
@@ -206,6 +213,15 @@ export default function Profile() {
                     type="email"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="phone">Phone Number</Label>
+                  <Input
+                    id="phone"
+                    type="tel"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                   />
                 </div>
                 <Button type="submit">Save Changes</Button>

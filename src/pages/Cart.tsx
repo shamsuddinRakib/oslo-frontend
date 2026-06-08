@@ -3,9 +3,16 @@ import { Trash2, Plus, Minus, ArrowRight } from "lucide-react";
 import { Button } from "@/src/components/ui/button";
 import { useCart } from "@/src/context/CartContext";
 import { Separator } from "@/src/components/ui/separator";
+import { useDocumentTitle } from "@/src/hooks/useDocumentTitle";
+import { useSettings } from "@/src/context/SettingsContext";
+import ReactPixel from 'react-facebook-pixel';
 
 export default function Cart() {
+  useDocumentTitle("Cart");
   const { cart, removeFromCart, updateQuantity, total } = useCart();
+  const { settings } = useSettings();
+  const shippingCharge = settings?.shipping_charge || 0;
+  const grandTotal = total > 0 ? total + shippingCharge : 0;
 
   if (cart.length === 0) {
     return (
@@ -28,7 +35,7 @@ export default function Cart() {
             <div key={item.id} className="flex gap-4">
               <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border bg-muted">
                 <img
-                  src={item.image}
+                  src={item.thumb_image}
                   alt={item.name}
                   className="h-full w-full object-cover"
                   referrerPolicy="no-referrer"
@@ -37,7 +44,7 @@ export default function Cart() {
               <div className="flex flex-1 flex-col justify-between">
                 <div className="flex justify-between text-base font-medium">
                   <h3>{item.name}</h3>
-                  <p className="ml-4">${(item.price * item.quantity).toFixed(2)}</p>
+                  <p className="ml-4">৳{(item.price * item.quantity).toFixed(2)}</p>
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <div className="flex items-center border rounded-md">
@@ -79,20 +86,28 @@ export default function Cart() {
           <div className="space-y-4">
             <div className="flex justify-between text-sm">
               <span>Subtotal</span>
-              <span>${total.toFixed(2)}</span>
+              <span>৳{total.toFixed(2)}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span>Shipping</span>
-              <span className="text-green-600 font-medium">Free</span>
+              <span className={shippingCharge === 0 ? "text-green-600 font-medium" : "font-medium"}>
+                {shippingCharge === 0 ? "Free" : `৳${shippingCharge.toFixed(2)}`}
+              </span>
             </div>
             <Separator />
             <div className="flex justify-between text-lg font-bold">
               <span>Total</span>
-              <span>${total.toFixed(2)}</span>
+              <span>৳{grandTotal.toFixed(2)}</span>
             </div>
           </div>
-          <Link to="/checkout" className="block">
-            <Button className="w-full" size="lg">
+          <Link to="/checkout" className="block" >
+            <Button className="w-full" size="lg" onClick={() => {
+              ReactPixel.track('InitiateCheckout', {
+                num_items: cart.length,
+                value: grandTotal,
+                currency: 'BDT',
+              });
+            }}>
               Checkout <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
           </Link>

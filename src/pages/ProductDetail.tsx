@@ -1,31 +1,46 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { ShoppingCart, Heart, Truck, ShieldCheck, RotateCcw } from "lucide-react";
+import { ShoppingCart, Heart, Truck, ShieldCheck, RotateCcw, Loader2 } from "lucide-react";
 import { Button } from "@/src/components/ui/button";
-import { api } from "@/src/lib/api";
+import { api, SERVER_URL } from "@/src/lib/api";
 import { useCart } from "@/src/context/CartContext";
+import { useDocumentTitle } from "@/src/hooks/useDocumentTitle";
 import { toast } from "sonner";
 import { Separator } from "@/src/components/ui/separator";
+import ReactPixel from 'react-facebook-pixel';
 
 export default function ProductDetail() {
   const { id } = useParams();
   const [product, setProduct] = useState<any>(null);
   const [selectedImage, setSelectedImage] = useState<string>("");
   const { addToCart } = useCart();
+  useDocumentTitle(product ? product.name : "Product Details");
+
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setLoading(true);
     api.getProducts().then((products) => {
       const found = products.find((p: any) => p.id === id);
       setProduct(found);
       if (found) {
-        setSelectedImage(found.image);
+        setSelectedImage(found.thumb_image);
       }
+      setLoading(false);
     });
   }, [id]);
 
-  if (!product) return <div className="container mx-auto py-20 text-center">Loading...</div>;
+  if (loading) {
+    return (
+      <div className="container mx-auto py-32 flex justify-center items-center">
+        <Loader2 className="h-10 w-10 animate-spin text-primary" />
+      </div>
+    );
+  }
 
-  const images = product.images && product.images.length > 0 ? product.images : [product.image];
+  if (!product) return <div className="container mx-auto py-20 text-center">Product not found.</div>;
+
+  const images = product.images && product.images.length > 0 ? product.images : [product.thumb_image];
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -33,21 +48,22 @@ export default function ProductDetail() {
         <div className="space-y-4">
           <div className="aspect-square overflow-hidden rounded-2xl bg-muted">
             <img
-              src={selectedImage || product.image}
+              src={selectedImage || product.thumb_image}
               alt={product.name}
               className="h-full w-full object-cover transition-all duration-300"
               referrerPolicy="no-referrer"
             />
           </div>
-
+          
           {images.length > 1 && (
             <div className="flex gap-4">
               {images.map((img: string, idx: number) => (
                 <button
                   key={idx}
                   onClick={() => setSelectedImage(img)}
-                  className={`relative h-20 w-20 overflow-hidden rounded-lg border-2 transition-all ${selectedImage === img ? "border-primary" : "border-transparent opacity-70 hover:opacity-100"
-                    }`}
+                  className={`relative h-20 w-20 overflow-hidden rounded-lg border-2 transition-all ${
+                    selectedImage === img ? "border-primary" : "border-transparent opacity-70 hover:opacity-100"
+                  }`}
                 >
                   <img
                     src={img}
@@ -66,10 +82,10 @@ export default function ProductDetail() {
             <p className="text-sm font-bold uppercase tracking-widest text-primary">{product.category}</p>
             <h1 className="text-4xl font-bold tracking-tight">{product.name}</h1>
             <div className="flex items-center gap-4">
-              <span className="text-2xl font-bold">${product.price.toFixed(2)}</span>
+              <span className="text-2xl font-bold">৳{product.price.toFixed(2)}</span>
               {product.originalPrice > product.price && (
                 <span className="text-lg text-muted-foreground line-through">
-                  ${product.originalPrice.toFixed(2)}
+                  ৳ {product.originalPrice.toFixed(2)}
                 </span>
               )}
             </div>
@@ -83,6 +99,11 @@ export default function ProductDetail() {
             <Button size="lg" className="flex-1 gap-2" onClick={() => {
               addToCart(product);
               toast.success("Added to cart");
+              ReactPixel.track('AddToCart', {
+                content_name: product.name,
+                value: product.price,
+                currency: 'BDT',
+              });
             }}>
               <ShoppingCart className="h-5 w-5" />
               Add to Cart
@@ -97,7 +118,7 @@ export default function ProductDetail() {
           <div className="grid grid-cols-1 gap-4">
             <div className="flex items-center gap-3 text-sm">
               <Truck className="h-5 w-5 text-muted-foreground" />
-              <span>Free shipping on orders over $100</span>
+              <span>Free shipping on orders over ৳100</span>
             </div>
             <div className="flex items-center gap-3 text-sm">
               <RotateCcw className="h-5 w-5 text-muted-foreground" />

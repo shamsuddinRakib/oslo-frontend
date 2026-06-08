@@ -2,26 +2,35 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "@/src/context/CartContext";
 import { useAuth } from "@/src/context/AuthContext";
+import { useDocumentTitle } from "@/src/hooks/useDocumentTitle";
 import { api } from "@/src/lib/api";
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
 import { Label } from "@/src/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card";
 import { toast } from "sonner";
+import { useSettings } from "@/src/context/SettingsContext";
+import ReactPixel from 'react-facebook-pixel';
 
 export default function Checkout() {
+  useDocumentTitle("Checkout");
   const { cart, total, clearCart } = useCart();
+  const { settings } = useSettings();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [successOrder, setSuccessOrder] = useState<any>(null);
+  
+  const shippingCharge = settings?.shipping_charge || 0;
+  const grandTotal = total > 0 ? total + shippingCharge : 0;
 
   const [formData, setFormData] = useState({
     email: user?.email || "",
     name: user?.name || "",
+    phone: user?.phone || "",
     address: "",
     city: "",
     zip: "",
-    phone: "",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -30,23 +39,77 @@ export default function Checkout() {
 
     setLoading(true);
     try {
-      const order = {
-        items: cart,
-        total,
-        customer: formData,
-        userId: user?.id || "guest",
-        paymentMethod: "COD",
+      const orderPayload = {
+        user: {
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          address: `${formData.address}, ${formData.city}, ${formData.zip}`,
+        },
+        items: cart.map(item => ({
+          product_id: parseInt(item.id) || item.id, // Parse ID if possible
+          quantity: item.quantity,
+          product_image: item.thumb_image || ''
+        })),
+        total_amount: grandTotal,
+        shipping_charge: shippingCharge,
       };
-      await api.createOrder(order);
+
+      const res = await api.createOrder(orderPayload);
+      if (!res.ok) {
+        throw new Error(res.message || "Failed to place order");
+      }
+
       clearCart();
       toast.success("Order placed successfully!");
-      navigate("/orders");
-    } catch (error) {
-      toast.error("Failed to place order");
+      
+      if (user) {
+        navigate("/orders");
+      } else {
+        setSuccessOrder(res.order);
+      }
+    } catch (error: any) {
+      toast.error(error.message || "Failed to place order");
     } finally {
       setLoading(false);
     }
   };
+
+  if (successOrder) {
+    return (
+      <div className="container mx-auto px-4 py-20 max-w-2xl text-center">
+        <div className="mb-8 flex justify-center">
+          <div className="h-20 w-20 bg-primary/10 rounded-full flex items-center justify-center">
+            <svg className="w-10 h-10 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+          </div>
+        </div>
+        <h1 className="text-4xl font-bold tracking-tight mb-4">Order Successful!</h1>
+        <p className="text-muted-foreground mb-8 text-lg">Thank you for your purchase. Your order has been placed.</p>
+        <Card className="text-left border-primary/20 shadow-lg">
+          <CardHeader className="bg-muted/30 border-b">
+            <CardTitle className="flex justify-between items-center">
+              <span>Order #{successOrder.order_id}</span>
+              <span className="text-sm px-3 py-1 bg-primary/10 text-primary rounded-full capitalize">{successOrder.status}</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6 pt-6">
+            <div className="flex justify-between items-center text-lg">
+              <span className="font-medium">Total Amount:</span>
+              <span className="font-bold">৳{successOrder.total_amount}</span>
+            </div>
+            <div className="border-t pt-4">
+              <h3 className="font-semibold text-lg mb-3">Shipping Details</h3>
+              <div className="space-y-1 text-muted-foreground">
+                <p><span className="font-medium text-foreground">Name:</span> {successOrder.user_name}</p>
+                <p><span className="font-medium text-foreground">Phone:</span> {successOrder.user_phone}</p>
+                <p><span className="font-medium text-foreground">Address:</span> {successOrder.shipping_address}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -73,6 +136,15 @@ export default function Checkout() {
                   required
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="phone">Phone Number</Label>
+                <Input
+                  id="phone"
+                  required
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                 />
               </div>
               <div className="grid gap-2">
@@ -104,15 +176,6 @@ export default function Checkout() {
                   />
                 </div>
               </div>
-              <div className="grid gap-2">
-                <Label htmlFor="phone">Phone Number</Label>
-                <Input
-                  id="phone"
-                  required
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                />
-              </div>
             </div>
           </div>
 
@@ -124,8 +187,15 @@ export default function Checkout() {
             </div>
           </div>
 
-          <Button type="submit" className="w-full" size="lg" disabled={loading}>
-            {loading ? "Placing Order..." : `Place Order ($${total.toFixed(2)})`}
+          <Button type="submit" className="w-full" size="lg" disabled={loading}
+            onClick={() => {
+              ReactPixel.track('Purchase', {
+                num_items: cart.length,
+                value: grandTotal,
+                currency: 'BDT',
+              });
+            }}>
+            {loading ? "Placing Order..." : `Place Order (৳${grandTotal.toFixed(2)})`}
           </Button>
         </form>
 
@@ -138,12 +208,22 @@ export default function Checkout() {
               {cart.map((item) => (
                 <div key={item.id} className="flex justify-between text-sm">
                   <span>{item.name} x {item.quantity}</span>
-                  <span>${(item.price * item.quantity).toFixed(2)}</span>
+                  <span>৳{(item.price * item.quantity).toFixed(2)}</span>
                 </div>
               ))}
+              <div className="pt-4 flex justify-between text-sm">
+                <span>Subtotal</span>
+                <span>৳{total.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span>Shipping</span>
+                <span className={shippingCharge === 0 ? "text-green-600 font-medium" : "font-medium"}>
+                  {shippingCharge === 0 ? "Free" : `৳${shippingCharge.toFixed(2)}`}
+                </span>
+              </div>
               <div className="pt-4 border-t flex justify-between font-bold">
                 <span>Total</span>
-                <span>${total.toFixed(2)}</span>
+                <span>৳{grandTotal.toFixed(2)}</span>
               </div>
             </CardContent>
           </Card>

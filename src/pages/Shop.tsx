@@ -2,11 +2,13 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { ProductCard } from "@/src/components/ProductCard";
 import { api } from "@/src/lib/api";
+import { useDocumentTitle } from "@/src/hooks/useDocumentTitle";
 import { Input } from "@/src/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/components/ui/select";
-import { Search } from "lucide-react";
+import { Search, Loader2 } from "lucide-react";
 
 export default function Shop() {
+  useDocumentTitle("Shop");
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -15,9 +17,14 @@ export default function Shop() {
 
   const categoryFilter = searchParams.get("category");
 
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    api.getProducts().then(setProducts);
-    api.getCategories().then(setCategories);
+    setLoading(true);
+    Promise.all([
+      api.getProducts().then(setProducts),
+      api.getCategories().then(setCategories)
+    ]).finally(() => setLoading(false));
   }, []);
 
   useEffect(() => {
@@ -91,7 +98,11 @@ export default function Shop() {
         </aside>
 
         <div className="flex-1">
-          {filteredProducts.length > 0 ? (
+          {loading ? (
+            <div className="flex justify-center items-center py-20">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+          ) : filteredProducts.length > 0 ? (
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredProducts.map((product: any) => (
                 <ProductCard key={product.id} product={product} />

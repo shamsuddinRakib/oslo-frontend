@@ -137,7 +137,7 @@ export function Footer() {
             )}
             <h3 className="text-lg font-bold uppercase tracking-tight text-foreground">{settings?.website_name || "OSLO BD"}</h3>
           </Link>
-          <p className="text-sm text-muted-foreground">Quality Gear Quality Life.</p>
+          <p className="text-sm text-muted-foreground">Quality Gear Quality Life...</p>
         </div>
         <div className="space-y-4">
           <h4 className="text-sm font-bold uppercase tracking-wider">Shop</h4>

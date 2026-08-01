@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { ShoppingCart, Heart, Truck, ShieldCheck, RotateCcw, Loader2 } from "lucide-react";
+import { ShoppingCart, Heart, Truck, ShieldCheck, RotateCcw, Loader2, Zap } from "lucide-react";
 import { Button } from "@/src/components/ui/button";
 import { api, SERVER_URL } from "@/src/lib/api";
 import { useCart } from "@/src/context/CartContext";
@@ -118,16 +118,13 @@ export default function ProductDetail() {
           <div className="grid grid-cols-1 gap-4">
             <div className="flex items-center gap-3 text-sm">
               <Truck className="h-5 w-5 text-muted-foreground" />
-              <span>Free shipping on orders over ৳100</span>
+              <span>Free shipping on orders over ৳ 1000</span>
             </div>
             <div className="flex items-center gap-3 text-sm">
-              <RotateCcw className="h-5 w-5 text-muted-foreground" />
-              <span>30-day easy return policy</span>
+              <Zap className="h-5 w-5 text-muted-foreground" />
+              <span>Fast Delivery</span>
             </div>
-            <div className="flex items-center gap-3 text-sm">
-              <ShieldCheck className="h-5 w-5 text-muted-foreground" />
-              <span>2-year warranty included</span>
-            </div>
+           
           </div>
         </div>
       </div>

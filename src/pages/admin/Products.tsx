@@ -16,7 +16,7 @@ export default function AdminProducts() {
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<any>(null);
   const [thumbPreview, setThumbPreview] = useState<string>("");
-  const [imagesPreviews, setImagesPreviews] = useState<string[]>([]);
+  const [imagesList, setImagesList] = useState<{file: File | null, preview: string}[]>([]);
   const thumbInputRef = useRef<HTMLInputElement>(null);
   const imagesInputRef = useRef<HTMLInputElement>(null);
 
@@ -33,7 +33,7 @@ export default function AdminProducts() {
   useEffect(() => {
     if (editingProduct) {
       setThumbPreview(editingProduct.thumb_image || "");
-      setImagesPreviews(editingProduct.images || []);
+      setImagesList((editingProduct.images || []).map((url: string) => ({ file: null, preview: url })));
       setMrp(editingProduct.originalPrice || "");
       setDiscountType(editingProduct.discount_type || "flat");
       setDiscount(editingProduct.discount || "");
@@ -41,7 +41,7 @@ export default function AdminProducts() {
       setStock(editingProduct.stock || 0);
     } else {
       setThumbPreview("");
-      setImagesPreviews([]);
+      setImagesList([]);
       setMrp("");
       setDiscountType("flat");
       setDiscount("");
@@ -84,8 +84,14 @@ export default function AdminProducts() {
   const handleImagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files.length > 0) {
-      const newPreviews = Array.from(files).map(file => URL.createObjectURL(file));
-      setImagesPreviews(prev => [...prev, ...newPreviews]);
+      const newItems = Array.from(files).map(file => ({
+        file,
+        preview: URL.createObjectURL(file)
+      }));
+      setImagesList(prev => [...prev, ...newItems]);
+    }
+    if (imagesInputRef.current) {
+      imagesInputRef.current.value = "";
     }
   };
 
@@ -110,11 +116,11 @@ export default function AdminProducts() {
     }
     
     // More images
-    if (imagesInputRef.current?.files) {
-      Array.from(imagesInputRef.current.files).forEach(file => {
-        data.append("images[]", file);
-      });
-    }
+    imagesList.forEach(item => {
+      if (item.file) {
+        data.append("images[]", item.file);
+      }
+    });
 
     try {
       if (editingProduct) {
@@ -135,7 +141,7 @@ export default function AdminProducts() {
       setIsAddOpen(false);
       setEditingProduct(null);
       setThumbPreview("");
-      setImagesPreviews([]);
+      setImagesList([]);
       fetchData();
     } catch (error) {
       toast.error("Operation failed");
@@ -167,7 +173,7 @@ export default function AdminProducts() {
           if (!open) {
             setEditingProduct(null);
             setThumbPreview("");
-            setImagesPreviews([]);
+            setImagesList([]);
           }
         }}>
           <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
@@ -266,13 +272,13 @@ export default function AdminProducts() {
               <div className="grid gap-2">
                 <Label>More Images</Label>
                 <div className="grid grid-cols-4 gap-4">
-                  {imagesPreviews.map((preview, index) => (
+                  {imagesList.map((item, index) => (
                     <div key={index} className="relative aspect-square rounded-lg border bg-muted overflow-hidden group">
-                      <img src={preview} alt="" className="h-full w-full object-cover" referrerPolicy="no-referrer" />
+                      <img src={item.preview} alt="" className="h-full w-full object-cover" referrerPolicy="no-referrer" />
                       <button
                         type="button"
                         onClick={() => {
-                          setImagesPreviews(prev => prev.filter((_, i) => i !== index));
+                          setImagesList(prev => prev.filter((_, i) => i !== index));
                         }}
                         className="absolute top-2 right-2 p-1.5 rounded-full bg-black/50 text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/80"
                       >

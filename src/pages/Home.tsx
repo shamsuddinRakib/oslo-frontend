@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, ShoppingBag, ShieldCheck, Truck, RotateCcw, Loader2 } from "lucide-react";
+import { ArrowRight, ShoppingBag, ShieldCheck, Truck, RotateCcw, Loader2, CloudLightning, Zap } from "lucide-react";
 import { Button } from "@/src/components/ui/button";
 import { ProductCard } from "@/src/components/ProductCard";
 import { api } from "@/src/lib/api";
@@ -55,29 +55,51 @@ export default function Home() {
         </div>
       )}
       {/* Hero Section */}
-      <section className="relative h-[80vh] flex items-center overflow-hidden bg-muted/30">
-        {/* Mobile Background Image Carousel */}
-        <div className="absolute inset-0 md:hidden">
-          <AnimatePresence mode="wait">
-            <motion.img
-              key={currentHero}
-              src={ heroImages[currentHero]}
-              alt="Hero Mobile"
-              initial={{ opacity: 0.5 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 1 }}
-              className="h-full w-full object-cover"
-              referrerPolicy="no-referrer"
-            />
-          </AnimatePresence>
-          <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/20 to-background/80" />
+      <section className="relative w-full mb-8 md:mb-0">
+        {/* Mobile View */}
+        <div className="relative w-full md:hidden aspect-[4/5] sm:aspect-[16/9] flex items-end justify-center pb-12 overflow-hidden bg-muted">
+          <div className="absolute inset-0">
+            <AnimatePresence mode="wait">
+              <motion.img
+                key={currentHero}
+                src={heroImages[currentHero]}
+                alt="Hero Mobile"
+                initial={{ opacity: 0.5 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 1 }}
+                className="h-full w-full object-cover"
+                referrerPolicy="no-referrer"
+              />
+            </AnimatePresence>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+          </div>
+          
+          <div className="relative z-10 w-full flex flex-col items-center gap-6 px-4">
+            <Link to="/shop">
+              <Button size="lg" className="px-10 rounded-full shadow-xl bg-primary text-primary-foreground font-bold border-2 border-white/20 hover:scale-105 transition-transform">Explore Now</Button>
+            </Link>
+            
+            {/* Carousel Indicators for Mobile */}
+            <div className="flex gap-2">
+              {heroImages.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setCurrentHero(idx)}
+                  className={`h-1.5 rounded-full transition-all duration-300 ${
+                    currentHero === idx ? "w-8 bg-white" : "w-2 bg-white/50"
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
         </div>
 
-        <div className="container mx-auto px-4 grid md:grid-cols-2 gap-8 items-center relative z-10">
+        {/* Desktop View */}
+        <div className="hidden md:grid container mx-auto px-4 grid-cols-2 gap-8 items-center relative z-10 min-h-[600px] py-12">
           <div className="space-y-6">
             <p className="text-sm font-bold uppercase tracking-[0.3em] text-primary">New Collection 2026</p>
-            <h1 className="text-5xl md:text-5xl font-bold tracking-tighter leading-[1.1]">
+            <h1 className="text-5xl lg:text-6xl font-bold tracking-tighter leading-[1.1]">
               QUALITY GEAR <br /> QUALITY LIFE
             </h1>
             <p className="text-lg text-muted-foreground max-w-md">
@@ -92,7 +114,7 @@ export default function Home() {
               </Link>
             </div>
             
-            {/* Carousel Indicators */}
+            {/* Carousel Indicators for Desktop */}
             <div className="flex gap-2 pt-4">
               {heroImages.map((_, idx) => (
                 <button
@@ -106,7 +128,7 @@ export default function Home() {
             </div>
           </div>
           
-          <div className="hidden md:block relative h-[600px]">
+          <div className="relative h-[500px] lg:h-[600px] w-full">
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentHero}
@@ -222,7 +244,7 @@ export default function Home() {
                     <img
                       src={client.logo}
                       alt={client.name}
-                      className="max-h-full max-w-full object-contain grayscale hover:grayscale-0 transition-all duration-300"
+                      className="max-h-full max-w-full object-contain transition-all duration-300"
                     />
                   </div>
                   <p className="text-sm font-medium text-muted-foreground whitespace-normal text-center">{client.name}</p>
@@ -241,21 +263,21 @@ export default function Home() {
               <Truck className="h-6 w-6" />
             </div>
             <h4 className="font-bold">Free Shipping</h4>
-            <p className="text-sm text-muted-foreground">On all orders over ৳100</p>
+            <p className="text-sm text-muted-foreground">On all orders over ৳ 1000</p> 
           </div>
           <div className="flex flex-col items-center text-center space-y-4">
             <div className="h-12 w-12 rounded-full bg-background flex items-center justify-center shadow-sm">
-              <RotateCcw className="h-6 w-6" />
+              <Zap className="h-6 w-6" />
             </div>
-            <h4 className="font-bold">Easy Returns</h4>
-            <p className="text-sm text-muted-foreground">30-day return policy</p>
+            <h4 className="font-bold">Fast Delivery</h4>
+            <p className="text-sm text-muted-foreground">Nation Wide Delivery within 3-4 days</p>
           </div>
           <div className="flex flex-col items-center text-center space-y-4">
             <div className="h-12 w-12 rounded-full bg-background flex items-center justify-center shadow-sm">
               <ShieldCheck className="h-6 w-6" />
             </div>
             <h4 className="font-bold">Secure Payment</h4>
-            <p className="text-sm text-muted-foreground">100% secure checkout</p>
+            <p className="text-sm text-muted-foreground">100% secure with Cash on Delivery</p>
           </div>
           <div className="flex flex-col items-center text-center space-y-4">
             <div className="h-12 w-12 rounded-full bg-background flex items-center justify-center shadow-sm">

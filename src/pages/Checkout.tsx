@@ -133,7 +133,7 @@ export default function Checkout() {
                 <Input
                   id="email"
                   type="email"
-                  required
+                  
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 />
@@ -167,10 +167,10 @@ export default function Checkout() {
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="zip">ZIP Code</Label>
+                  <Label htmlFor="zip">Postal Code</Label>
                   <Input
                     id="zip"
-                    required
+                    
                     value={formData.zip}
                     onChange={(e) => setFormData({ ...formData, zip: e.target.value })}
                   />

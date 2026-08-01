@@ -66,10 +66,12 @@ export function ProductCard({ product }: ProductCardProps) {
           <Heart className={cn("h-4 w-4", isWishlisted && "fill-current")} />
         </Button>
       </div>
+      <Link to={`/product/${product.id}`}>
       <CardContent className="lg:pt-4 px-4">
-        <p className="text-xs text-muted-foreground uppercase tracking-wider ">{product.category}</p>
-        <h3 className="font-medium text-sm line-clamp-1">{product.name}</h3>
+        <p className="text-xs text-muted-foreground  tracking-wider ">{product.category}</p>
+        <h3 className="font-medium text-md line-clamp-1">{product.name}</h3>
       </CardContent>
+      </Link>
       <CardFooter className="lg:pb-4 px-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="font-bold text-sm">৳ {product.price.toFixed(2)}</span>

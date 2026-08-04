@@ -13,6 +13,7 @@ import { toast } from "sonner";
 export default function AdminProducts() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<any>(null);
   const [thumbPreview, setThumbPreview] = useState<string>("");
@@ -158,15 +159,23 @@ export default function AdminProducts() {
 
   return (
     <div className="space-y-8">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h1 className="text-3xl font-bold tracking-tight">Products</h1>
-        <Button onClick={() => {
-          setEditingProduct(null);
-          setIsAddOpen(true);
-        }}>
-          <Plus className="h-4 w-4 mr-2" />
-          Add Product
-        </Button>
+        <div className="flex items-center gap-4 w-full sm:w-auto">
+          <Input
+            placeholder="Search by product name..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full sm:w-64"
+          />
+          <Button onClick={() => {
+            setEditingProduct(null);
+            setIsAddOpen(true);
+          }}>
+            <Plus className="h-4 w-4 mr-2" />
+            Add Product
+          </Button>
+        </div>
 
         <Dialog open={isAddOpen} onOpenChange={(open) => {
           setIsAddOpen(open);
@@ -335,7 +344,9 @@ export default function AdminProducts() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {products.map((product: any) => (
+            {products.filter((product: any) =>
+              product.name?.toLowerCase().includes(searchQuery.toLowerCase())
+            ).map((product: any) => (
               <TableRow key={product.id}>
                 <TableCell>
                   <div className="h-10 w-10 rounded bg-muted overflow-hidden">

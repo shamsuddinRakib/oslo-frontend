@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { api } from "@/src/lib/api";
 import { Button } from "@/src/components/ui/button";
+import { Input } from "@/src/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/src/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/src/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/components/ui/select";
@@ -13,6 +14,7 @@ import { Printer } from "lucide-react";
 export default function AdminOrders() {
   const [orders, setOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     fetchData();
@@ -38,7 +40,16 @@ export default function AdminOrders() {
 
   return (
     <div className="space-y-8">
-      <h1 className="text-3xl font-bold tracking-tight">Orders</h1>
+      <div className="flex justify-between items-center">
+        <h1 className="text-3xl font-bold tracking-tight">Orders</h1>
+        <div className="w-72">
+          <Input 
+            placeholder="Search by Order ID..." 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+      </div>
 
       <div className="border rounded-lg">
         <Table>
@@ -53,9 +64,11 @@ export default function AdminOrders() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {orders.map((order: any) => (
-              <TableRow key={order.id}>
-                <TableCell className="font-medium">{order.id}</TableCell>
+            {orders.filter((order: any) => 
+              order.order_id?.toLowerCase().includes(searchQuery.toLowerCase())
+            ).map((order: any) => (
+              <TableRow key={order.order_id}>
+                <TableCell className="font-medium"># {order.order_id}</TableCell>
                 <TableCell>{order.user_name || "N/A"}</TableCell>
                 <TableCell>{format(new Date(order.created_at), "MMM d, yyyy")}</TableCell>
                 <TableCell>৳{order.total_amount}</TableCell>

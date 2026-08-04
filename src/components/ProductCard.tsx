@@ -67,17 +67,17 @@ export function ProductCard({ product }: ProductCardProps) {
         </Button>
       </div>
       <Link to={`/product/${product.id}`}>
-      <CardContent className="lg:pt-4 px-4">
+      <CardContent className="lg:pt-4 px-1 lg:px-3">
         <p className="text-xs text-muted-foreground  tracking-wider ">{product.category}</p>
-        <h3 className="font-medium text-md line-clamp-1">{product.name}</h3>
+        <h3 className="font-medium text-md lg:text-lg line-clamp-1">{product.name}</h3>
       </CardContent>
       </Link>
-      <CardFooter className="lg:pb-4 px-4 flex items-center justify-between">
+      <CardFooter className="lg:pb-4 px-1 md:px-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="font-bold text-sm">৳ {product.price.toFixed(2)}</span>
+          <span className="font-semibold text-sm lg:text-xl">৳ {product.price.toFixed(0)}</span>
           {product.originalPrice > product.price && (
-            <span className="text-xs text-muted-foreground line-through">
-              ৳ {product.originalPrice.toFixed(2)} 
+            <span className="text-sm px-1 lg:text-lg font- text-red-500 line-through">
+              ৳ {product.originalPrice.toFixed(0)} 
             </span>
           )}
         </div>

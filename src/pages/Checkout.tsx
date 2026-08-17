@@ -21,8 +21,8 @@ export default function Checkout() {
   const [loading, setLoading] = useState(false);
   const [successOrder, setSuccessOrder] = useState<any>(null);
   
-  const shippingCharge = settings?.shipping_charge || 0;
-  const grandTotal = total > 0 ? total + shippingCharge : 0;
+  const shippingCharge = settings?.shipping_charge ? (parseFloat(total) > 1000 ? 0 : settings?.shipping_charge) : 0;
+  const grandTotal = total > 0 ? total + shippingCharge : 0; 
 
   const [formData, setFormData] = useState({
     email: user?.email || "",
@@ -158,7 +158,7 @@ export default function Checkout() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="city">City</Label>
+                  <Label htmlFor="city">City/District</Label>
                   <Input
                     id="city"
                     required
@@ -167,7 +167,7 @@ export default function Checkout() {
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="zip">Postal Code</Label>
+                  <Label htmlFor="zip">Postal Code (optional)</Label>
                   <Input
                     id="zip"
                     

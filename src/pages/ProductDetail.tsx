@@ -65,8 +65,8 @@ export default function ProductDetail() {
         <span className="text-foreground font-medium truncate max-w-[200px] md:max-w-[300px]">{product.name}</span>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-12">
-        <div className="space-y-4">
+      <div className="grid md:grid-cols-2 gap-12 ">
+        <div className="space-y-4 overflow-scroll">
           <div className="aspect-square overflow-hidden rounded-2xl bg-muted">
             <img
               src={selectedImage || product.thumb_image}
@@ -77,7 +77,7 @@ export default function ProductDetail() {
           </div>
           
           {images.length > 1 && (
-            <div className="flex gap-4">
+            <div className="flex gap-4 ">
               {images.map((img: string, idx: number) => (
                 <button
                   key={idx}

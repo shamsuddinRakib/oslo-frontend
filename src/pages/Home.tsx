@@ -163,7 +163,7 @@ export default function Home() {
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {categories.slice(0, 4).map((cat: any) => (
-            <Link key={cat.id} to={`/shop?category=${cat.name}`} className="group relative aspect-[4/5] overflow-hidden rounded-xl bg-muted">
+            <Link key={cat.id} to={`/shop?category=${cat.id}`} className="group relative aspect-[4/5] overflow-hidden rounded-xl bg-muted">
               <img
                 src={cat.image_url}
                 alt={cat.name}

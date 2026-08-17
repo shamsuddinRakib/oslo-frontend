@@ -20,31 +20,36 @@ export default function Shop() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setLoading(true);
-    Promise.all([
-      api.getProducts().then(setProducts),
-      api.getCategories().then(setCategories)
-    ]).finally(() => setLoading(false));
+    api.getCategories().then(setCategories);
   }, []);
 
   useEffect(() => {
     const q = searchParams.get("q");
-    if (q !== null) {
+    if (q !== null && q !== search) {
       setSearch(q);
     }
   }, [searchParams]);
 
-  const filteredProducts = products
-    .filter((p: any) => {
-      const matchesCategory = !categoryFilter || p.category === categoryFilter;
-      const matchesSearch = p.name.toLowerCase().includes(search.toLowerCase());
-      return matchesCategory && matchesSearch;
-    })
-    .sort((a: any, b: any) => {
-      if (sortBy === "price-low") return a.price - b.price;
-      if (sortBy === "price-high") return b.price - a.price;
-      return 0;
-    });
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      setLoading(true);
+      let sortVal = sortBy;
+      if (sortBy === "price-low") sortVal = "price_asc";
+      if (sortBy === "price-high") sortVal = "price_desc";
+      if (sortBy === "newest") sortVal = "latest";
+      
+      api.getProducts({
+        category: categoryFilter || undefined,
+        search: search || undefined,
+        sort: sortVal
+      })
+      .then(setProducts)
+      .finally(() => setLoading(false));
+    }, 300);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [categoryFilter, search, sortBy]);
+
 
   return (
     <div className="container mx-auto px-4 py-8 space-y-8">
@@ -57,7 +62,16 @@ export default function Shop() {
               placeholder="Search products..."
               className="pl-8"
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                const params = new URLSearchParams(searchParams);
+                if (e.target.value) {
+                  params.set("q", e.target.value);
+                } else {
+                  params.delete("q");
+                }
+                setSearchParams(params);
+              }}
             />
           </div>
           <Select value={sortBy} onValueChange={setSortBy}>
@@ -79,7 +93,11 @@ export default function Shop() {
             <h3 className="font-bold mb-4">Categories</h3>
             <div className="space-y-2">
               <button
-                onClick={() => setSearchParams({})}
+                onClick={() => {
+                  const params = new URLSearchParams(searchParams);
+                  params.delete("category");
+                  setSearchParams(params);
+                }}
                 className={`block text-sm hover:underline ${!categoryFilter ? "font-bold text-primary" : "text-muted-foreground"}`}
               >
                 All Categories
@@ -87,8 +105,12 @@ export default function Shop() {
               {categories.map((cat: any) => (
                 <button
                   key={cat.id}
-                  onClick={() => setSearchParams({ category: cat.name })}
-                  className={`block text-sm hover:underline ${categoryFilter === cat.name ? "font-bold text-primary" : "text-muted-foreground"}`}
+                  onClick={() => {
+                    const params = new URLSearchParams(searchParams);
+                    params.set("category", cat.id.toString());
+                    setSearchParams(params);
+                  }}
+                  className={`block text-sm hover:underline ${categoryFilter === cat.id.toString() ? "font-bold text-primary" : "text-muted-foreground"}`}
                 >
                   {cat.name}
                 </button>
@@ -102,9 +124,9 @@ export default function Shop() {
             <div className="flex justify-center items-center py-20">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
-          ) : filteredProducts.length > 0 ? (
+          ) : products.length > 0 ? (
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredProducts.map((product: any) => (
+              {products.map((product: any) => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>

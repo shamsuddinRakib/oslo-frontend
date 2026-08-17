@@ -11,8 +11,8 @@ export default function Cart() {
   useDocumentTitle("Cart");
   const { cart, removeFromCart, updateQuantity, total } = useCart();
   const { settings } = useSettings();
-  const shippingCharge = settings?.shipping_charge || 0;
-  const grandTotal = total > 0 ? total + shippingCharge : 0;
+  const shippingCharge = settings?.shipping_charge ? (parseFloat(total) > 1000 ? 0 : settings?.shipping_charge) : 0;
+  const grandTotal = total > 0 ? total + shippingCharge : 0; 
 
   if (cart.length === 0) {
     return (

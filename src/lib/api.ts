@@ -56,8 +56,14 @@ export const api = {
     return res;
   },
 
-  getProducts: async () => {
-    const res = await fetch(`${API_BASE}/products`, {
+  getProducts: async (params?: { category?: string, search?: string, sort?: string }) => {
+    const query = new URLSearchParams();
+    if (params?.category) query.append("category", params.category);
+    if (params?.search) query.append("search", params.search);
+    if (params?.sort) query.append("sort", params.sort);
+    
+    const queryString = query.toString() ? `?${query.toString()}` : "";
+    const res = await fetch(`${API_BASE}/products${queryString}`, {
       headers: getHeaders(),
     }).then((res) => res.json());
     return (res.products || []).map((p: any) => ({

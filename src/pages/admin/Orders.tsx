@@ -128,7 +128,10 @@ export default function AdminOrders() {
                 <div className="space-y-2">
                   {selectedOrder.order_items?.map((item: any) => (
                     <div key={item.id} className="flex justify-between text-sm">
+                      <div className="flex items-center gap-2">
+                      <img src={item.product_image} alt={item.name} className="w-20 h-20 px-2 object-cover" />
                       <span>{item.product_name} x {item.quantity}</span>
+                      </div>
                       <span>৳{(item.product_price * item.quantity).toFixed(2)}</span>
                     </div>
                   ))}

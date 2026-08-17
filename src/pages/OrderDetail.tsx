@@ -127,7 +127,7 @@ export default function OrderDetail() {
                   {order.order_items?.map((item: any) => (
                     <div key={item.id} className="flex gap-4">
                       <div className="h-16 w-16 rounded bg-muted overflow-hidden flex-shrink-0">
-                        <img src={IMAGE_URL +'/'+ item.product_image} alt={item.name} className="h-full w-full object-cover" />
+                        <img src={ item.product_image} alt={item.name} className="h-full w-full object-cover" />
                       </div>
                       <div className="flex-1 flex justify-between">
                         <div>

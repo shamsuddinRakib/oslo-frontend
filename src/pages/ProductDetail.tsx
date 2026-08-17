@@ -119,7 +119,7 @@ export default function ProductDetail() {
 
           <div className="flex gap-4">
             <Button size="lg" className="flex-1 gap-2 h-12" onClick={() => {
-              addToCart(product);
+              addToCart(product, selectedImage || product.thumb_image);
               toast.success("Added to cart");
               ReactPixel.track('AddToCart', {
                 content_name: product.name,

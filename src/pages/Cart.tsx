@@ -35,7 +35,7 @@ export default function Cart() {
             <div key={item.id} className="flex gap-4">
               <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border bg-muted">
                 <img
-                  src={item.thumb_image}
+                  src={item.image}
                   alt={item.name}
                   className="h-full w-full object-cover"
                   referrerPolicy="no-referrer"
@@ -52,7 +52,7 @@ export default function Cart() {
                       variant="ghost"
                       size="icon"
                       className="h-8 w-8"
-                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                      onClick={() => updateQuantity(item.id, item.quantity - 1, item.image)}
                     >
                       <Minus className="h-3 w-3" />
                     </Button>
@@ -61,7 +61,7 @@ export default function Cart() {
                       variant="ghost"
                       size="icon"
                       className="h-8 w-8"
-                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                      onClick={() => updateQuantity(item.id, item.quantity + 1, item.image)}
                     >
                       <Plus className="h-3 w-3" />
                     </Button>
@@ -70,7 +70,7 @@ export default function Cart() {
                     variant="ghost"
                     size="sm"
                     className="text-destructive hover:text-destructive"
-                    onClick={() => removeFromCart(item.id)}
+                    onClick={() => removeFromCart(item.id, item.image)}
                   >
                     <Trash2 className="h-4 w-4 mr-2" />
                     Remove

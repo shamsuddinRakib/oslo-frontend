@@ -32,7 +32,7 @@ export default function Categories() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {categories.map((category: any) => (
-            <Link key={category.id} to={`/shop?category=${category.name}`}>
+            <Link key={category.id} to={`/shop?category=${category.id}`}>
               <Card className="group overflow-hidden border-none shadow-sm hover:shadow-xl transition-all duration-300 bg-muted/30">
                 <div className="aspect-[16/9] overflow-hidden relative">
                   <img

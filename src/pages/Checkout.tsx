@@ -49,7 +49,7 @@ export default function Checkout() {
         items: cart.map(item => ({
           product_id: parseInt(item.id) || item.id, // Parse ID if possible
           quantity: item.quantity,
-          product_image: item.thumb_image || ''
+          image: item.image || ''
         })),
         total_amount: grandTotal,
         shipping_charge: shippingCharge,
@@ -207,8 +207,9 @@ export default function Checkout() {
             <CardContent className="space-y-4">
               {cart.map((item) => (
                 <div key={item.id} className="flex justify-between text-sm">
-                  <span>{item.name} x {item.quantity}</span>
-                  <span>৳{(item.price * item.quantity).toFixed(2)}</span>
+                  <img src={item.image} alt={item.name} className="w-20 h-20 px-2 object-cover" />
+                  <span>{(item.name)} x {item.quantity}</span>
+                  <p className='px-2 font-semibold'>৳{(item.price * item.quantity).toFixed(2)}</p>
                 </div>
               ))}
               <div className="pt-4 flex justify-between text-sm">
